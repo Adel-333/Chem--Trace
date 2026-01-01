@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chem Trace | Advanced Detection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --bb-green: #4a8f3c; /* Breaking Bad Green */
+            --bb-green-light: #7abf6d;
+            --bb-dark: #0f1110;
+            --bb-gray: #1f2321;
+            --text-white: #f0f0f0;
+            --smoke: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bb-dark);
+            color: var(--text-white);
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 17, 16, 0.95);
+            border-bottom: 2px solid var(--bb-green);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--bb-green-light);
+        }
+
+        /* --- Periodic Table Element Style --- */
+        .element-box {
+            display: inline-block;
+            background-color: var(--bb-green);
+            color: white;
+            width: 2.2em; /* Scalable size */
+            height: 2.2em;
+            position: relative;
+            margin-right: 2px;
+            vertical-align: middle;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 15px rgba(74, 143, 60, 0.3);
+        }
+
+        .element-box .atomic-number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 0.25em;
+            font-weight: bold;
+        }
+
+        .element-box .symbol {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -45%);
+            font-size: 0.65em;
+            font-weight: 700;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .element-box .atomic-weight {
+            position: absolute;
+            bottom: 2px;
+            right: 3px; 
+            font-size: 0.2em; 
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a2e1a 0%, var(--bb-dark) 70%);
+            position: relative;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .hero-title .element-box {
+            width: 140px;
+            height: 140px;
+            font-size: 100px; /* Base size for inner text calculation */
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .hero-title .element-box:hover {
+            transform: scale(1.05) rotate(-2deg);
+            background-color: var(--bb-green-light);
+        }
+
+        .hero-title span.text-part {
+            margin-left: 5px;
+            color: white;
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            color: #ccc;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            animation: fadeIn 2s ease;
+        }
+
+        .hero-accuracy {
+            margin-top: 2rem;
+            background: rgba(74, 143, 60, 0.2);
+            padding: 10px 30px;
+            border: 1px solid var(--bb-green);
+            color: var(--bb-green-light);
+            font-family: 'Oswald';
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        /* --- Standard Sections --- */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            border-left: 5px solid var(--bb-green);
+            padding-left: 20px;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            color: var(--text-white);
+        }
+
+        /* --- Stats Grid --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bb-gray);
+            border-top: 3px solid var(--bb-green);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .stat-card h3 {
+            font-size: 3.5rem;
+            color: var(--bb-green-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* --- Design Section --- */
+        .design-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        
+        .design-card {
+            background: var(--bb-gray);
+            padding: 1.5rem;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .design-card h4 {
+            color: var(--bb-green-light);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .design-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #444;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        /* --- Results (Graphs) --- */
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .graph-card {
+            background: var(--bb-gray);
+            padding: 1rem;
+            border: 1px solid #333;
+        }
+
+        .graph-card h3 {
+            color: var(--bb-green-light);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 0.5rem;
+        }
+
+        .graph-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        /* --- Analysis (Table & Equations) --- */
+        .analysis-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        .data-table-container {
+            background: white; 
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .data-table-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .reaction-box {
+            background: rgba(30, 35, 33, 0.8);
+            border-left: 4px solid var(--bb-green);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .reaction-title {
+            color: var(--bb-green-light);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .chemical-equation {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        .chemical-equation sub {
+            font-size: 0.6em;
+        }
+
+        /* --- Team --- */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-member {
+            background: var(--bb-gray);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #333;
+            transition: transform 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            border-color: var(--bb-green);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--bb-green);
+            color: var(--bb-dark);
+            font-weight: bold;
+            font-size: 2rem; /* Size of the Element Symbol */
+            border-radius: 0; /* Square for element look */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1rem;
+            font-family: 'Oswald';
+            border: 2px solid rgba(255,255,255,0.2);
+            position: relative;
+        }
+
+        .avatar-atomic {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 12px;
+        }
+
+        /* --- Location Section --- */
+        .location-container {
+            text-align: center;
+            background: var(--bb-gray);
+            padding: 2rem;
+            border: 1px solid #333;
+        }
+        
+        .location-container img {
+            max-width: 100%;
+            max-height: 500px;
+            border: 4px solid var(--bb-green);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-top: 1rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: black;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            margin-top: 4rem;
+            border-top: 1px solid #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+                flex-direction: column;
+            }
+            .hero-title .element-box {
+                width: 100px;
+                height: 100px;
+                font-size: 70px;
+            }
+            .results-container, .design-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none; 
+            }
+            .nav-container {
+                justify-content: center;
+            }
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/black-felt.png');
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="element-box" style="font-size: 16px;">
+                    <span class="atomic-number">6</span>
+                    <span class="symbol">C</span>
+                    <span class="atomic-weight">12.01</span>
+                </span>hem
+                &nbsp;
+                <span class="element-box" style="font-size: 16px;">
+                    <span class="atomic-number">22</span>
+                    <span class="symbol">Ti</span>
+                    <span class="atomic-weight">47.86</span>
+                </span>race
+            </div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#design">Design</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#analysis">Analysis</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#location">Location</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="hero-title">
+            <div style="display:flex; align-items:center;">
+                <div class="element-box">
+                    <span class="atomic-number">6</span>
+                    <span class="symbol">C</span>
+                    <span class="atomic-weight">12.011</span>
+                </div>
+                <span class="text-part">hem</span>
+            </div>
+            <div style="width: 20px;"></div>
+            <div style="display:flex; align-items:center;">
+                <div class="element-box">
+                    <span class="atomic-number">22</span>
+                    <span class="symbol">Ti</span>
+                    <span class="atomic-weight">47.867</span>
+                </div>
+                <span class="text-part">race</span>
+            </div>
+        </div>
+        <div class="hero-tagline">Advanced Chemical Detection System</div>
+        <div class="hero-accuracy">ACCURACY: 95.57%</div>
+    </section>
+
+    <section id="about">
+        <div class="section-header">
+            <h2>Project Overview</h2>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>95.57%</h3>
+                <p>Detection Accuracy</p>
+            </div>
+            <div class="stat-card">
+                <h3>2</h3>
+                <p>Sensors Used (MQ-135, MQ-2)</p>
+            </div>
+            <div class="stat-card">
+                <h3>0.5s</h3>
+                <p>Response Time</p>
+            </div>
+        </div>
+        <p style="font-size: 1.1rem; line-height: 1.6; color: #ccc;">
+            Chem Trace utilizes a simplified but highly effective array of sensors to detect hazardous chemical byproducts. By focusing on the <strong>MQ-135</strong> (Air Quality/Ammonia) and <strong>MQ-2</strong> (Combustible Gas/Hydrogen), we have achieved a high-precision detection system capable of real-time monitoring in volatile environments.
+        </p>
+    </section>
+
+    <section id="design">
+        <div class="section-header">
+            <h2>Our Design</h2>
+        </div>
+        <div class="design-grid">
+            <div class="design-card">
+                <h4>3D Prototype Model</h4>
+                <img src="3d.jpeg" alt="3D Model of the device">
+            </div>
+            <div class="design-card">
+                <h4>Circuit Assembly</h4>
+                <img src="circuit.jpeg" alt="Circuit breadboard connection">
+            </div>
+        </div>
+    </section>
+
+    <section id="results">
+        <div class="section-header">
+            <h2>Experimental Results</h2>
+        </div>
+        <div class="results-container">
+            <div class="graph-card">
+                <h3>Reaction 1: Ammonia (MQ-135)</h3>
+                <img src="mq 135 results.png" alt="Graph of MQ-135 Sensor Response for Ammonia">
+                <p style="margin-top:10px; color:#aaa; font-size:0.9rem;">
+                    Time-series data showing the concentration rise of Ammonia ($NH_3$) detected by the MQ-135 sensor across 5 trials.
+                </p>
+            </div>
+            
+            <div class="graph-card">
+                <h3>Reaction 2: Hydrogen (MQ-2)</h3>
+                <img src="MQ 2 results.png" alt="Graph of MQ-2 Sensor Response for Hydrogen">
+                <p style="margin-top:10px; color:#aaa; font-size:0.9rem;">
+                    Concentration profiles for Hydrogen generation detected by the MQ-2 sensor, demonstrating consistent linearity across trials.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="analysis">
+        <div class="section-header">
+            <h2>Data Analysis & Reactions</h2>
+        </div>
+
+        <div class="analysis-layout">
+            <div>
+                <h3 style="color:var(--bb-green-light); margin-bottom:1rem;">Numerical Data Validation</h3>
+                <div class="data-table-container">
+                    <img src="tablle.jpeg" alt="Data Table showing Theoretical vs Measured Values">
+                </div>
+            </div>
+
+            <div class="reaction-box">
+                <div class="reaction-title">Reaction 1: Ammonia Synthesis</div>
+                <div class="chemical-equation">
+                    NH<sub>4</sub>Cl<sub>(s)</sub> + NaOH<sub>(aq)</sub> &rarr; NH<sub>3(g)</sub> + H<sub>2</sub>O<sub>(aq)</sub> + NaCl<sub>(s)</sub>
+                </div>
+                <p style="color:#888;">Solid Ammonium Chloride reacts with Sodium Hydroxide to release Ammonia gas.</p>
+
+                <hr style="border-color: #333; margin: 2rem 0;">
+
+                <div class="reaction-title">Reaction 2: Hydrogen Generation</div>
+                <div class="chemical-equation">
+                    2Al<sub>(s)</sub> + 2NaOH<sub>(s)</sub> + 6H<sub>2</sub>O &rarr; 3H<sub>2(g)</sub> + 2NaAl(OH)<sub>4</sub>
+                </div>
+                <p style="color:#888;">Aluminum reacts with Sodium Hydroxide and water to produce Hydrogen gas and Sodium Aluminate.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="team">
+        <div class="section-header">
+            <h2>The Lab Team</h2>
+        </div>
+        <div class="team-grid">
+            
+            <div class="team-member">
+                <div class="avatar">
+                    <span class="avatar-atomic">11</span>
+                    Ad
+                </div>
+                <h4>Adel Mohamed</h4>
+                <p style="color:#666; font-size:0.8rem;">Research Team</p>
+            </div>
+
+            <div class="team-member">
+                <div class="avatar">
+                    <span class="avatar-atomic">36</span>
+                    Ky
+                </div>
+                <h4>Kyrillos Youssef</h4>
+                <p style="color:#666; font-size:0.8rem;">Research Team</p>
+            </div>
+
+            <div class="team-member">
+                <div class="avatar">
+                    <span class="avatar-atomic">42</span>
+                    Mu
+                </div>
+                <h4>Mustafa Saied</h4>
+                <p style="color:#666; font-size:0.8rem;">Research Team</p>
+            </div>
+
+            <div class="team-member">
+                <div class="avatar">
+                    <span class="avatar-atomic">54</span>
+                    Ze
+                </div>
+                <h4>Zeyad Khaled</h4>
+                <p style="color:#666; font-size:0.8rem;">Research Team</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="location">
+        <div class="section-header">
+            <h2>Location</h2>
+        </div>
+        <div class="location-container">
+            <h3 style="margin-bottom: 20px; font-size: 2rem; color: var(--bb-green-light);">
+                STEM High School for Boys - 6th of October
+            </h3>
+            <img src="location .jpeg" alt="STEM High School for Boys - 6th of October">
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Chem Trace | STEM Egypt Capstone Project</p>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
